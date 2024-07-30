@@ -10,8 +10,16 @@ namespace Authentication.Services
         {
             data = new List<Person>()
             {
-                new Person("Gabriel","1234"),
-                new Person("Hakobyan","4321")
+                new Person()
+                {
+                    Email="Gabriel",
+                    Password= "1234"
+                },
+                new Person()
+                {
+                    Email="Hakobyan",
+                    Password= "4321"
+                }
             };
         }
         public List<Person> Get => data;

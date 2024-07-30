@@ -4,10 +4,10 @@
     {
         public string Email {  get; set; }=string.Empty;
         public string Password {  get; set; }=string.Empty;
-        public Person(string mail,string pass)
-        {
-            Email = mail;
-            Password = pass;
-        }
+        //public Person(string mail,string pass)
+        //{
+        //    Email = mail;
+        //    Password = pass;
+        //}
     }
 }

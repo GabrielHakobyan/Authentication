@@ -11,7 +11,11 @@ namespace Authentication.Controllers
     public class HomeController(IPerson person) : Controller
     {
         IPerson _person = person;
-
+        [Authorize]
+        public IActionResult Inde()
+        {
+            return RedirectToAction("Index");
+        }
         public IActionResult Index()
         {
             return View();
@@ -20,14 +24,21 @@ namespace Authentication.Controllers
         {
             return View();
         }
+
+        //public string Createjwt([FromBody] Person person)
+        //{
+        //    var pers = _person.Get.Where(a => a.Email == person.Email && a.Password == person.Password);
+        //    // Person pers = new Person();
+        //    string a = "dasd";
+        //    return a;
+        //}
         [HttpPost]
-        public string LoginIn([FromBody] Person person)
+        public IResult LoginIn([FromBody] Person person)
         {
-            var pers =  _person.Get.Where(a=>a.Email==person.Email && a.Password==person.Password);
-            if (pers.Any())
+            var pers = _person.Get.Where(a => a.Email == person.Email && a.Password == person.Password).FirstOrDefault();
+            if (pers == null)
             {
-                string x = "non content";
-                return x;
+                return Results.Unauthorized();
             }
             var claims = new List<Claim> { new(ClaimTypes.Name, person.Email) };
             // создаем JWT-токен
@@ -46,7 +57,7 @@ namespace Authentication.Controllers
                 username = person.Email
             };
 
-            return encodedJwt;
+            return Results.Json(response);
         }
     }
 }
