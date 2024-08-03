@@ -10,6 +10,10 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMvc();
+builder.Services.AddSession(option =>
+{
+    option.IdleTimeout = TimeSpan.FromMinutes(20);
+});
 builder.Services.AddAuthorization();
 builder.Services.AddTransient<IPerson, PersonDB>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -25,18 +29,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["testycooki"];
+                return Task.CompletedTask;
+            }
+        };
     });
 var app = builder.Build();
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
-
+//app.UseStaticFiles();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 
 
-app.MapControllerRoute(name: "default", pattern: ("{controller=Home}/{action=Login}/{id?}"));
+app.MapControllerRoute(name: "default", pattern: ("{controller=Home}/{action=Index}/{id?}"));
 //app.Map("/login/{username}", (string username) =>
 //{
 //    var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };
