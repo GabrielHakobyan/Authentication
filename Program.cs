@@ -1,4 +1,5 @@
 ﻿using Authentication.AuthModel;
+using Authentication.DataBase;
 using Authentication.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -15,7 +16,7 @@ builder.Services.AddSession(option =>
     option.IdleTimeout = TimeSpan.FromMinutes(20);
 });
 builder.Services.AddAuthorization();
-builder.Services.AddTransient<IPerson, PersonDB>();
+builder.Services.AddTransient<IPersons, OperationDb>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -48,7 +49,7 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 
-app.MapControllerRoute(name: "default", pattern: ("{controller=Home}/{action=Index}/{id?}"));
+app.MapControllerRoute(name: "default", pattern: ("{controller=Home}/{action=Login}/{id?}"));
 //app.Map("/login/{username}", (string username) =>
 //{
 //    var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };

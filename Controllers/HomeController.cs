@@ -1,4 +1,5 @@
 ﻿using Authentication.AuthModel;
+using Authentication.Model;
 using Authentication.Services;
 using Authentication.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -11,11 +12,11 @@ using System.Security.Claims;
 
 namespace Authentication.Controllers
 {
-    public class HomeController(IPerson person) : Controller
+    public class HomeController(IPersons person) : Controller
     {
-        IPerson _person = person;
-        [AuthorizationFilter]
-      //  [Authorize]
+        IPersons _person = person;
+        //[AuthorizationFilter]
+        [Authorize(Roles ="user")]
         public IActionResult Index()
         {
             return View();
@@ -36,14 +37,20 @@ namespace Authentication.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult LoginIn(Person person)
         {
-           
-            var pers = _person.Get.Where(a => a.Email == person.Email && a.Password == person.Password).FirstOrDefault();
+            Persons pers = new Persons()
+            {
+                Name = person.Email.ToString(), Password = person.Password.ToString()
+            };
+            
+            var per = _person.GetAll().Where(a => a.Name == person.Email && a.Password == person.Password).FirstOrDefault();
             if (pers == null)
             {
                 ModelState.AddModelError("", "Polzovatel ne sushestvuet!");
                 return RedirectToAction("Login", "Home");
             }
-            var claims = new List<Claim> { new(ClaimTypes.Name, person.Email)};
+            var claims = new List<Claim> { new(ClaimTypes.Name, per.Name),
+            new Claim(ClaimTypes.Role,per.roles.ToString())
+            };
             // создаем JWT-токен
             var jwt = new JwtSecurityToken(
                     issuer: AuthOptions.ISSUER,
