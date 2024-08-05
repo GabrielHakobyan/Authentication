@@ -4,7 +4,7 @@ namespace Authentication.Services
 {
     public interface IPersons
     {
-        IEnumerable<Persons> GetAll();
+        Task<Persons> GetAll(Persons pers);
         IEnumerable<Roles> GetAllRoles();
     }
 }

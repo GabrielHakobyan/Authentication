@@ -16,7 +16,7 @@ namespace Authentication.Controllers
     {
         IPersons _person = person;
         //[AuthorizationFilter]
-        [Authorize(Roles ="user")]
+        [Authorize(Roles ="admin")]
         public IActionResult Index()
         {
             return View();
@@ -35,21 +35,22 @@ namespace Authentication.Controllers
         //}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LoginIn(Person person)
+        public  async Task<IActionResult> LoginIn(Person person)
         {
-            Persons pers = new Persons()
+            Persons per = new Persons()
             {
                 Name = person.Email.ToString(), Password = person.Password.ToString()
             };
+
+            var pers = await _person.GetAll(per);
             
-            var per = _person.GetAll().Where(a => a.Name == person.Email && a.Password == person.Password).FirstOrDefault();
             if (pers == null)
             {
                 ModelState.AddModelError("", "Polzovatel ne sushestvuet!");
                 return RedirectToAction("Login", "Home");
             }
-            var claims = new List<Claim> { new(ClaimTypes.Name, per.Name),
-            new Claim(ClaimTypes.Role,per.roles.ToString())
+            var claims = new List<Claim> { new(ClaimTypes.Name, pers.Name),
+            new Claim(ClaimTypes.Role,pers.roles.Name.ToString())
             };
             // создаем JWT-токен
             var jwt = new JwtSecurityToken(
